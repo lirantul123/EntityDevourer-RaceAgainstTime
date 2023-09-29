@@ -172,7 +172,26 @@ void Game::ProcessInput() {
     }
 }
 
+void WrapCoordinates(int& ox, int& oy, int ix, int iy)
+{
+    ox = ix;
+    oy = iy;
+
+    if (ix < 0) ox = SCREEN_WIDTH + ix + 25; // Wrap from left to right-                  WORKS AS PREDICTED
+    if (ix >= SCREEN_WIDTH) ox = ix - SCREEN_WIDTH - 29; // Wrap from right to left
+    if (iy < 0) oy = SCREEN_HEIGHT + iy; // Wrap from top to bottom-                      WORKS AS PREDICTED
+    if (iy >= SCREEN_HEIGHT) oy = iy - SCREEN_HEIGHT-20; // Wrap from bottom to top
+}
 void Game::UpdateGame() {
+    //
+    int wrappedX, wrappedY;
+    WrapCoordinates(wrappedX, wrappedY, mPlayer.position.x, mPlayer.position.y);
+
+    // Update the player's position with the wrapped coordinates
+    mPlayer.position.x = wrappedX;
+    mPlayer.position.y = wrappedY;
+    //
+
     // Calculate elapsed time in seconds
     Uint32 currentTime = SDL_GetTicks();
     float elapsedTime = (currentTime - mGameStartTime) / 1000.0f;
@@ -289,9 +308,8 @@ void Game::UpdateGame() {
         // Update the last spawn time
         mLastObjectSpawnTime = mCurrentTime;
     }
+
 }
-
-
 
 void Game::GenerateOutput() {
     SDL_SetRenderDrawColor(mRenderer, 0, 0, 0, 255); // Clear the screen to black
